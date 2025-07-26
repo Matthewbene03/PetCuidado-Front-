@@ -9,5 +9,6 @@ export const appConfig: ApplicationConfig = {
 };
 
 export const appSettings = {
+  production: true,
   apiBaseUrl: 'https://petcuidado-back.onrender.com'
 };
