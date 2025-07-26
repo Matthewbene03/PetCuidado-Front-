@@ -1,0 +1,22 @@
+#navMenu{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding: 50px;
+    background-color: rgba(56, 129, 13, 0.795);
+    margin-bottom: 15px;
+}
+
+#navMenu a{
+    text-decoration: none;
+    padding: 20px;
+    color: rgb(211, 211, 211);
+    font-size: 20px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+#navMenu a:hover{
+    border-radius: 5px;
+    color: black;
+    background-color: rgba(56, 129, 13, 0.795);
+}

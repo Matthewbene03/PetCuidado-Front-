@@ -1,0 +1,28 @@
+<nav id="navMenu">
+    <div class="gerente" *ngIf="cargo === 'Gerente'">
+        <a routerLink="realizarAgendamento">Realizar Agendamento</a>
+        <a routerLink="cadastrarPessoa">Cadastro de pessoa</a>
+        <a routerLink="cadastrarPet">Cadastro de pet</a>
+        <a routerLink="cadastrarServico">Cadastro de serviços</a>
+        <a routerLink="cadastrarFuncionario">Cadastro de funcionarios</a>
+        <a routerLink="listaAgendamentos">Lista de agendamentos</a>
+        <a href="" (click)="logout()">Sair</a>
+    </div>
+    <div class="secretaria" *ngIf="cargo === 'Secretaria'">
+        <a routerLink="realizarAgendamento">Realizar Agendamento</a>
+        <a routerLink="cadastrarPessoa">Cadastro de pessoa</a>
+        <a routerLink="cadastrarPet">Cadastro de pet</a>
+        <a routerLink="cadastrarServico">Cadastro de serviços</a>
+        <a routerLink="listaAgendamentos">Lista de agendamentos</a>
+        <a href="" (click)="logout()">Sair</a>
+    </div>
+    <div class="medico" *ngIf="cargo === 'Medico_Veterinario'">
+        <a routerLink="verificarHorario">Verificar horarios</a>
+        <a href="" (click)="logout()">Sair</a>
+    </div>
+    <div class="cuidador" *ngIf="cargo === 'Cuidador'">
+        <a routerLink="verificarHorario">Verificar horarios</a>
+        <a href="" (click)="logout()">Sair</a>
+    </div>
+</nav>
+<router-outlet></router-outlet>

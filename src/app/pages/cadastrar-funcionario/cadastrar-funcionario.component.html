@@ -1,0 +1,28 @@
+<body>
+    <h2>Cadastro de funcionario</h2>
+    <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
+        <div class="pessoa">
+            <label id="pessoa">Dados do funcionario novo:</label><br />
+            <select formControlName="pessoa">
+                <option *ngFor="let pessoa of pessoas" [ngValue]="pessoa">{{ pessoa.nome }}</option>
+            </select>
+        </div>
+        <div class="cargo">
+            <label id="cargo">Cargo:</label><br />
+            <select formControlName="cargo">
+                <option *ngFor="let cargo of enumCargos" [value]="cargo">{{ cargo }}</option>
+            </select>
+        </div>
+        <div class="usuario">
+            <label id="usuario">Usuario:</label><br />
+            <input formControlName="usuario">
+        </div>
+        <div class="senha">
+            <label id="senha">Senha:</label><br />
+            <input formControlName="senha">
+        </div>
+        <div class="divBtn">
+            <button id="btnCadastro" type="submit" [disabled]="formulario.invalid">Cadastrar</button>
+        </div>
+    </form>
+</body>
