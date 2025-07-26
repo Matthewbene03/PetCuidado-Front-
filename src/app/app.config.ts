@@ -10,6 +10,6 @@ export const appConfig: ApplicationConfig = {
 
 export const appSettings = {
   production: true,
-  apiBaseUrl: 'https://petcuidado-back.onrender.com'
+  apiBaseUrl: 'https://p3tcuidado-back.onrender.com'
   //apiBaseUrl: 'http://localhost:8080'
 };
