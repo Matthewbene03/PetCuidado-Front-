@@ -36,7 +36,7 @@ select{
     height: 44px;
 }
 
-div.pessoa, div.cargo{
+div.pessoa, div.cargo, div.pagamento{
     grid-column: 1/3;
 }
 

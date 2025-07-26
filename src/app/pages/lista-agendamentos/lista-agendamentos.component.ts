@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Agendamento } from '../../models/agendamento';
 import { AgendamentoService } from '../../services/agendamento.service';
+import { Pagamento } from '../../models/pagamento';
+import { PagamentoService } from '../../services/pagamento.service';
 
 @Component({
   selector: 'app-lista-agendamentos',
@@ -13,43 +15,73 @@ import { AgendamentoService } from '../../services/agendamento.service';
 })
 export class ListaAgendamentosComponent {
 
-  agendamentos: Agendamento[] = [];
+  pagamentos: Pagamento[] = [];
 
-  constructor(private agendamento: AgendamentoService, private router: Router) { }
+  constructor(private pagamento: PagamentoService, private router: Router) { }
 
   ngOnInit(): void {
     this.carregarProtudos();
   };
 
   carregarProtudos(): void {
-    this.agendamento.listar().subscribe(agendamentos => {
-      this.agendamentos = agendamentos.sort((a, b) =>
-        new Date(b.data).getTime() - new Date(a.data).getTime()
-      );
+    this.pagamento.listar().subscribe(pagamento => {
+      this.pagamentos = pagamento.sort((a, b) => {
+        const nomeA = a.status.toLowerCase();
+        const nomeB = b.status.toLowerCase();
+        return nomeB.localeCompare(nomeA);
+      });
     });
   }
 
   carregarProtudosPet(): void {
-    this.agendamentos.sort((a, b) => {
-      const nomeA = a.pet.nome.toLowerCase();
-      const nomeB = b.pet.nome.toLowerCase();
+    this.pagamentos.sort((a, b) => {
+      const nomeA = a.agendamento.pet.nome.toLowerCase();
+      const nomeB = b.agendamento.pet.nome.toLowerCase();
       return nomeA.localeCompare(nomeB);
     });
   }
 
   carregarProtudosFuncionario(): void {
-    this.agendamentos.sort((a, b) => {
-      const nomeA = a.funcionario.pessoa.nome.toLowerCase();
-      const nomeB = b.funcionario.pessoa.nome.toLowerCase();
+    this.pagamentos.sort((a, b) => {
+      const nomeA = a.agendamento.funcionario.pessoa.nome.toLowerCase();
+      const nomeB = b.agendamento.funcionario.pessoa.nome.toLowerCase();
       return nomeA.localeCompare(nomeB);
     });
   }
 
   carregarProtudosServico(): void {
-    this.agendamentos.sort((a, b) => {
-      const descA = a.servico.descricao.toLowerCase();
-      const descB = b.servico.descricao.toLowerCase();
+    this.pagamentos.sort((a, b) => {
+      const descA = a.agendamento.servico.descricao.toLowerCase();
+      const descB = b.agendamento.servico.descricao.toLowerCase();
       return descA.localeCompare(descB);
     });
+  }
+
+  carregarPagamento(): void {
+    this.pagamentos.sort((a, b) => {
+      const descA = a.metodo.toLowerCase();
+      const descB = b.metodo.toLowerCase();
+      return descA.localeCompare(descB);
+    });
+  }
+
+  carregarStatus(): void {
+    this.pagamentos.sort((a, b) => {
+      const descA = a.status.toLowerCase();
+      const descB = b.status.toLowerCase();
+      return descB.localeCompare(descA);
+    });
+  }
+
+  carregarData(): void {
+    this.pagamento.listar().subscribe(pagamento => {
+      this.pagamentos = pagamento.sort((a, b) => {
+        return new Date(b.dataVencimento).getTime() - new Date(a.dataVencimento).getTime();
+      });
+    });
+  }
+
+  executarAcao(pagamento: Pagamento): void {
+    this.router.navigate(['/menu/atividades'], { state: { pagamento: pagamento } });
   }
 }

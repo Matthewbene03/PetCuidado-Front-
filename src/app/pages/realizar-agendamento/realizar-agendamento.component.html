@@ -24,6 +24,12 @@
                 <option *ngFor="let servico of servicos" [ngValue]="servico">{{ servico.descricao}}</option>
             </select>
         </div>
+        <div class="pagamento">
+            <label id="pagamento">Forma de pagamento:</label><br />
+            <select formControlName="pagamento">
+                <option *ngFor="let pagamento of pagamentos" [ngValue]="pagamento">{{ pagamento}}</option>
+            </select>
+        </div>
         <div class="divBtn">
             <button id="btnCadastro" type="submit" [disabled]="formulario.invalid">Cadastrar</button>
         </div>

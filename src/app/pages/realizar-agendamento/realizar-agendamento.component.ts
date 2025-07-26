@@ -12,6 +12,9 @@ import { Pet } from '../../models/pet';
 import { PetService } from '../../services/pet.service';
 import { ServicoService } from '../../services/servico.service';
 import { AgendamentoService } from '../../services/agendamento.service';
+import { PagamentoService } from '../../services/pagamento.service';
+import { Pagamento } from '../../models/pagamento';
+import { Agendamento } from '../../models/agendamento';
 
 @Component({
   selector: 'app-realizar-agendamento',
@@ -28,16 +31,18 @@ export class RealizarAgendamentoComponent {
   servicos: Servico[] = [];
   funcionarios: Funcionario[] = [];
   pets: Pet[] = [];
+  pagamentos: string[] = ['DINHEIRO', 'CREDITO', 'DEBITO', 'CHEQUE', 'PIX'];
   enumCargos: string[] = ['Medico_Veterinario', 'Cuidador'];
 
 
-  constructor(private fb: FormBuilder, private agendamento: AgendamentoService, private funcionarioService: FuncionarioService, private petService: PetService, private servicoService: ServicoService, private route: ActivatedRoute, private router: Router) {
+  constructor(private fb: FormBuilder, private agendamentoService: AgendamentoService, private funcionarioService: FuncionarioService, private petService: PetService, private servicoService: ServicoService, private pagamentoService: PagamentoService, private route: ActivatedRoute, private router: Router) {
     this.formulario = this.fb.group({
       id: [''], // campo opcional para identificar edição
       data: ['', Validators.required],
       pet: [null, Validators.required],
       funcionario: [null, Validators.required],
-      servico: [null, Validators.required]
+      servico: [null, Validators.required],
+      pagamento: ['', Validators.required]
     });
   }
 
@@ -72,9 +77,30 @@ export class RealizarAgendamentoComponent {
 
   onSubmit(): void {
     if (this.formulario.valid) {
-      this.agendamento.salvar(this.formulario.value).subscribe({
-        next: () => {
+      let agendamento = new Agendamento();
+      agendamento.data = this.formulario.get('data')?.value;
+      agendamento.funcionario = this.formulario.get('funcionario')?.value;
+      agendamento.pet = this.formulario.get('pet')?.value;
+      agendamento.servico = this.formulario.get('servico')?.value;
+
+      this.agendamentoService.salvar(agendamento).subscribe({
+        next: (agendamentoRecebido) => {
           alert('Agendamento cadastrado com sucesso!');
+
+          let pagamento = new Pagamento();
+          pagamento.dataVencimento = this.formulario.get('data')?.value;
+          pagamento.dataPagamento = this.formulario.get('data')?.value;
+          pagamento.agendamento = agendamentoRecebido;
+          pagamento.valor = agendamentoRecebido.servico.preco;
+          pagamento.metodo = this.formulario.get('pagamento')?.value;
+          this.pagamentoService.salvar(pagamento).subscribe({
+            next: () => {
+              console.log('Pagamento salvo com sucesso!');
+            },
+            error: (err) => {
+              console.error('Erro ao salvar pagamento', err);
+            }
+          });
           this.formulario.reset();
         },
         error: (err) => {

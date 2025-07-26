@@ -15,6 +15,8 @@ import { Agendamento } from '../../models/agendamento';
 import { Servico } from '../../models/servico';
 import { ServicoService } from '../../services/servico.service';
 import { AgendamentoService } from '../../services/agendamento.service';
+import { Pagamento } from '../../models/pagamento';
+import { PagamentoService } from '../../services/pagamento.service';
 
 @Component({
   selector: 'app-atividades',
@@ -27,6 +29,7 @@ export class AtividadesComponent {
 
   formulario: FormGroup;
   agendamentoRecebido: Agendamento = new Agendamento();
+  pagamentoRecebido: Pagamento = new Pagamento();
   nomePets: Pet[] = [];
   nomeDonos: Pessoa[] = [];
   descricoes: Servico[] = [];
@@ -34,12 +37,14 @@ export class AtividadesComponent {
 
   cargo: string | null = null;
 
-  constructor(private fb: FormBuilder, private funcionarioService: FuncionarioService, private petService: PetService, private pessoaService: PessoaService, private servico: ServicoService, private agendamento: AgendamentoService, private route: ActivatedRoute, private router: Router) {
+  constructor(private fb: FormBuilder, private funcionarioService: FuncionarioService, private petService: PetService, private pessoaService: PessoaService, private servico: ServicoService, private agendamento: AgendamentoService, private pagamento: PagamentoService, private route: ActivatedRoute, private router: Router) {
     this.cargo = this.funcionarioService.getCargoUsuarioLogado();
     this.formulario = this.fb.group({
       id: [''], // campo opcional para identificar edição
       nomePet: [null, Validators.required],
       nomeDono: [null, Validators.required],
+      funcionario: [null, Validators.required],
+      dataVencimento: [null, Validators.required],
       descricao: ['', Validators.required],
       status: ['', Validators.required]
     });
@@ -54,10 +59,22 @@ export class AtividadesComponent {
     }
 
     this.agendamentoRecebido = history.state.agendamento;
+    this.pagamentoRecebido = history.state.pagamento;
     if (this.agendamentoRecebido) {
       console.log(this.agendamentoRecebido);
       this.preencherFormulario(this.agendamentoRecebido);
       this.formulario.get('descricao')?.disable();
+    } else if (this.pagamentoRecebido) {
+      console.log(this.pagamentoRecebido);
+      this.preencherFormularioPagamento(this.pagamentoRecebido);
+      this.formulario.get('descricao')?.disable();
+      this.formulario.get('dataVencimento')?.disable();
+      if (this.pagamentoRecebido.status === "CONCLUIDO") {
+        this.formulario.patchValue({
+          status: this.listStatus[2]
+        });
+        this.formulario.get('status')?.disable();
+      }
     } else {
       this.petService.listar().subscribe(pet => {
         this.nomePets = pet;
@@ -75,17 +92,27 @@ export class AtividadesComponent {
 
   onSubmit(): void {
     if (this.formulario.valid) {
-      let statusModificado = this.formulario.get('status')?.value;
-      console.log(statusModificado);
-      this.agendamentoRecebido.status = statusModificado;
-      this.agendamento.salvar(this.agendamentoRecebido).subscribe(() => {
-        this.formulario.reset();
-        if (statusModificado === this.listStatus[2]) {
-          this.router.navigate(['/menu/']);
-        } else{
-          this.router.navigate(['/menu/verificarHorario']);
-        }
-      });
+      if (this.agendamentoRecebido) {
+        let statusModificado = this.formulario.get('status')?.value;
+        console.log(statusModificado);
+        this.agendamentoRecebido.status = statusModificado;
+        this.agendamento.salvar(this.agendamentoRecebido).subscribe(() => {
+          this.formulario.reset();
+          if (statusModificado === this.listStatus[2]) {
+            this.router.navigate(['/menu/']);
+          } else {
+            this.router.navigate(['/menu/verificarHorario']);
+          }
+        });
+      } else if (this.pagamentoRecebido) {
+        let statusModificado = this.formulario.get('status')?.value;
+        console.log(statusModificado);
+        this.pagamentoRecebido.status = statusModificado;
+        this.pagamento.salvar(this.pagamentoRecebido).subscribe(() => {
+          this.formulario.reset();
+          this.router.navigate(['/menu/listaAgendamentos']);
+        });
+      }
     }
   }
 
@@ -98,8 +125,28 @@ export class AtividadesComponent {
     });
   }
 
+  preencherFormularioPagamento(pagamento: Pagamento): void {
+    const dataFormatada = pagamento.dataVencimento
+      ? new Date(pagamento.dataVencimento).toISOString().split('T')[0]
+      : '';
+
+    this.formulario.patchValue({
+      nomePet: pagamento.agendamento.pet,
+      nomeDono: pagamento.agendamento.pet.pessoa,
+      funcionario: pagamento.agendamento.funcionario.pessoa,
+      dataVencimento: dataFormatada,
+      descricao: pagamento.agendamento.servico.descricao,
+      status: this.listStatus[0]
+    });
+  }
+
   sair(): void {
     this.formulario.reset();
     this.router.navigate(['/menu']);
+  }
+
+  sairPagamento(): void {
+    this.formulario.reset();
+    this.router.navigate(['/menu/listaAgendamentos']);
   }
 }
